@@ -9,12 +9,10 @@ import (
 	"image/jpeg"
 	_ "image/jpeg"
 	_ "image/png"
-	"io"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -100,28 +98,15 @@ func (bot *Bot) SendPhoto(chatId int, img image.Image) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("a")
-
-	tmpFile, _ := ioutil.TempFile("/tmp", "bot_*.png")
-	fmt.Println(tmpFile.Name())
-	f_w := bufio.NewWriter(tmpFile)
-	_, _ = f_w.Write(buf.Bytes())
-	_ = f_w.Flush()
-	f, _ := os.Open(tmpFile.Name())
-	//_, _ = tmpFile.Write(buf.Bytes())
 
 	formBuf := &bytes.Buffer{}
 	m_w := multipart.NewWriter(formBuf)
 	fmt.Println(m_w.FormDataContentType())
-	file, err := m_w.CreateFormFile("photo", tmpFile.Name())
+	file, err := m_w.CreateFormFile("photo", "")
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	_, err = io.Copy(file, f)
-	if err != nil {
-		fmt.Println(err)
-	}
+	_, _ = file.Write(buf.Bytes())
 
 	err = m_w.Close()
 	if err != nil {
